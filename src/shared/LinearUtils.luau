@@ -22,7 +22,7 @@ local function comparator(face, index, target, excluded)
     if index == excluded then return nil end
     return target:Dot(face)
 end
-function LinearUtils.CubeToClosestCF(target: CFrame)
+function LinearUtils.ClosestCubeElementToCF(target: CFrame)
     local targetFaces = {
         target.RightVector,
         target.LookVector,

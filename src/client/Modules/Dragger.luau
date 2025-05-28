@@ -46,7 +46,7 @@ local function dragMove(input: InputObject)
     }
     _, target.Handle = Shapes:PointOnFace(result, dragInfo.Increment)
     dragInfo.Target = target
-    local cubeOrientation = LinearUtils.CubeToClosestCF(dragInfo.Handle.Rotation:Inverse() * target.Instance.CFrame.Rotation * target.Handle.Rotation) * dragInfo.Orientation
+    local cubeOrientation = LinearUtils.ClosestCubeElementToCF(dragInfo.Handle.Rotation:Inverse() * target.Instance.CFrame.Rotation * target.Handle.Rotation) * dragInfo.Orientation
     --local cubeOrientation = (dragInfo.Handle.Rotation:Inverse() * target.Instance.CFrame.Rotation * target.Handle.Rotation):Inverse() * dragInfo.Orientation
     dragInfo.Joint.C1 = target.Handle * cubeOrientation
     dragInfo.Joint.Part1 = target.Instance
