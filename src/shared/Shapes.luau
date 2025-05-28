@@ -48,7 +48,7 @@ function Shapes:GetShape(instance: Instance)
 end
 function Shapes:GetFace(instance, normal)
     local shape = Shapes:GetShape(instance)
-    local face = Range.argmax(self.FACES[shape].FaceNormals, comparator, normal)[2]
+    local face = Range.argmax(self.FACES[shape].FaceNormals, comparator, normal / instance.Size)[2]
     return LinearUtils.ResizeCFrame(face, instance.Size)
 end
 function Shapes:PointOnFace(raycast: RaycastResult, increment: number)
