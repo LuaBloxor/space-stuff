@@ -48,22 +48,18 @@ function Previews:SetTransparencyForDescendants(instance: Instance, transparency
         for _, i in Restores do i() end
     end
 end
-function ConvertToPreview(part: BasePart)
-    Previews:SetTransparencyForDescendants(part, 0.5)
+function Previews:ConvertToPreview(part: BasePart)
+    local revert = Previews:SetTransparencyForDescendants(part, 0.5)
     part.CanCollide = false
     part.CanTouch = false
     part.CanQuery = false
     part.Massless = true
+    return revert
 end
 function Previews:PreviewPart(part: BasePart, joint: Weld?)
     local preview = part:Clone()
-    ConvertToPreview(part)
-    for _, i in part:GetDescendants() do
-        if i:IsA("BasePart") then
-            ConvertToPreview(part)
-        end
-    end
-    local lastPart0Event:RBXScriptConnection
+    Previews:ConvertToPreview(part)
+    local lastPart1Event:RBXScriptConnection
     local function unwelded()
         preview.Anchored = true
     end
@@ -77,17 +73,17 @@ function Previews:PreviewPart(part: BasePart, joint: Weld?)
     end
     if joint then
         joint.AncestryChanged:Connect(ancestryChanged)
-        if joint.Part0 then lastPart0Event = joint.Part0.AncestryChanged:Connect(ancestryChanged) end
+        if joint.Part1 then lastPart1Event = joint.Part1.AncestryChanged:Connect(ancestryChanged) end
         joint.Destroying:Connect(function()
-            if lastPart0Event then lastPart0Event:Disconnect() end
+            if lastPart1Event then lastPart1Event:Disconnect() end
             unwelded()
         end)
         joint.Changed:Connect(function(attr)
-            if attr == "Part1" and not joint.Part1 or attr == "Part0" and not joint.Part0 then
+            if attr == "Part0" and not joint.Part0 or attr == "Part1" and not joint.Part1 then
                 unwelded()
-            elseif attr == "Part0" and joint.Part0 then
-                if lastPart0Event then lastPart0Event:Disconnect() end
-                lastPart0Event = joint.Part0.AncestryChanged:Connect(ancestryChanged)
+            elseif attr == "Part1" and joint.Part1 then
+                if lastPart1Event then lastPart1Event:Disconnect() end
+                lastPart1Event = joint.Part1.AncestryChanged:Connect(ancestryChanged)
                 welded()
             end
         end)
@@ -95,3 +91,4 @@ function Previews:PreviewPart(part: BasePart, joint: Weld?)
     preview.Parent = previews
     return preview
 end
+return Previews

@@ -6,6 +6,7 @@ export type ToolModel = {
     Deselected: (Tool, Mouse?) -> (),
     Instantiated: (Tool) -> (),
     Tool: Tool,
+    [string]: any,
 }
 local ToolState = {}
 function ToolState.bindToDeactivate(tool: Tool, instance: any)

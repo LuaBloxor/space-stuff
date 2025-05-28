@@ -1,8 +1,8 @@
 local Shared = game.ReplicatedStorage.Shared
-local Range = require(Shared.FindRange)
+local Range = require(Shared.Range)
 local LinearUtils = require(Shared.LinearUtils)
 
-local function comparator(face, target)
+local function comparator(face, index, target)
     return target:Dot(face[1])
 end
 local Shapes = {}
