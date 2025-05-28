@@ -54,11 +54,12 @@ function Previews:ConvertToPreview(part: BasePart)
     part.CanTouch = false
     part.CanQuery = false
     part.Massless = true
+    part.Anchored = false
     return revert
 end
 function Previews:PreviewPart(part: BasePart, joint: Weld?)
     local preview = part:Clone()
-    Previews:ConvertToPreview(part)
+    Previews:ConvertToPreview(preview)
     local lastPart1Event:RBXScriptConnection
     local function unwelded()
         preview.Anchored = true

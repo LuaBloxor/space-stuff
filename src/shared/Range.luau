@@ -5,7 +5,7 @@ function Range.argmax<a, inputs...>(array: {a}, comparator: (a, number, inputs..
     local outputIndex
     for index, element in array do
         local newNearest = comparator(element, index, ...)
-        if not nearest and newNearest or newNearest > nearest then
+        if not nearest or newNearest and newNearest > nearest then
             nearest = newNearest
             output = element
             outputIndex = index
@@ -19,7 +19,7 @@ function Range.argmin<a, inputs...>(array: {a}, comparator: (a, number, inputs..
     local outputIndex
     for index, element in array do
         local newNearest = comparator(element, index, ...)
-        if not nearest and newNearest or newNearest < nearest then
+        if not nearest or newNearest and newNearest < nearest then
             nearest = newNearest
             output = element
             outputIndex = index

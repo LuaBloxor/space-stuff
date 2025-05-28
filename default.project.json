@@ -23,10 +23,10 @@
       }
     },
     "StarterPack": {
-      "Dragger": {
+      "Modify": {
         "$className": "Tool",
         "$properties": {
-          "ToolTip": "Move parts"
+          "RequiresHandle": false
         }
       }
     },
