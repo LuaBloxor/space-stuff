@@ -87,5 +87,4 @@ UserInputService.InputChanged:Connect(function(input, processed)
         dragMove(input)
     end
 end)
-ToolState.newTool(toolModel)
 return Dragger

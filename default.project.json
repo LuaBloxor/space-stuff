@@ -22,7 +22,14 @@
         }
       }
     },
-
+    "StarterPack": {
+      "Dragger": {
+        "$className": "Tool",
+        "$properties": {
+          "ToolTip": "Move parts"
+        }
+      }
+    },
     "Workspace": {
       "$properties": {
         "FilteringEnabled": true

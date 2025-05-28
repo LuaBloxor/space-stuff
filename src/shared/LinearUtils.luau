@@ -31,8 +31,8 @@ function LinearUtils.CubeToClosestCF(target: CFrame)
         -target.LookVector,
         -target.UpVector,
     }
-    local lookVector, _, lookIndex = Range.argmax(targetFaces, comparator, -Vector3.zAxis)
-    local upVector, _, upIndex = Range.argmax(targetFaces, comparator, Vector3.yAxis, lookIndex)
+    local _, _, lookIndex = Range.argmax(targetFaces, comparator, -Vector3.zAxis)
+    local _, _, upIndex = Range.argmax(targetFaces, comparator, Vector3.yAxis, lookIndex)
     return CFrame.lookAlong(Vector3.zero, CUBE[lookIndex], CUBE[upIndex])
 end
 return LinearUtils
