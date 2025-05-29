@@ -51,15 +51,15 @@ function Shapes:GetFace(instance, normal)
     local face = Range.argmax(self.FACES[shape].FaceNormals, comparator, normal / instance.Size)[2]
     return LinearUtils.ResizeCFrame(face, instance.Size)
 end
-function Shapes:PointOnFace(raycast: RaycastResult, increment: number)
+function Shapes:PointOnFace(raycast: RaycastResult|any, increment: number?): (Vector3, CFrame, CFrame)
     local instance = raycast.Instance
     local normal = raycast.Normal
     if not instance:IsA("BasePart") then
-        return CFrame.lookAlong(raycast.Position, normal)
+        return Vector3.zero, CFrame.lookAlong(raycast.Position, normal), CFrame.identity
     end
     local face = self:GetFace(instance, instance.CFrame:VectorToObjectSpace(normal))
     local position = face:Inverse() * instance.CFrame:Inverse() * raycast.Position
-    local gridPosition = LinearUtils.RoundVectorToPlane(position, increment)
-    return gridPosition, face * CFrame.new(gridPosition)
+    local gridPosition = if increment then LinearUtils.RoundVectorToPlane(position, increment) else position
+    return gridPosition, face * CFrame.new(gridPosition), face
 end
 return Shapes
