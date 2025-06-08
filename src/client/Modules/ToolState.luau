@@ -1,3 +1,4 @@
+--!strict
 local Player = game:GetService("Players").LocalPlayer
 local Trove = require(game.ReplicatedStorage.Shared.Trove)
 export type ToolModel = {

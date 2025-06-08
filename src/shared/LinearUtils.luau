@@ -1,3 +1,4 @@
+--!strict
 local LinearUtils = {}
 local Shared = game.ReplicatedStorage.Shared
 local Range = require(Shared.Range)
@@ -18,7 +19,7 @@ function LinearUtils.RoundVectorToPlane(vec: Vector3, increment: number)
     return Vector3.new(math.round(vec.X * increment) / increment, math.round(vec.Y * increment) / increment, 0)
 end
 
-local function comparator(face, index, target, excluded)
+local function comparator<index>(face: Vector3, index: index, target: Vector3, excluded: index?): number?
     if index == excluded then return nil end
     return target:Dot(face)
 end

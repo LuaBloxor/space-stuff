@@ -1,3 +1,4 @@
+--!strict
 local Player = game:GetService("Players").LocalPlayer
 local Mouse = Player:GetMouse()
 local UserInputService = game:GetService("UserInputService")
@@ -6,11 +7,20 @@ local ROT = CFrame.fromMatrix(Vector3.zero, -Vector3.xAxis, Vector3.yAxis, -Vect
 local Previews = require(script.Parent.Previews)
 local Shared = game.ReplicatedStorage.Shared
 local Shapes = require(Shared.Shapes)
+local MergeFunctionMap = require(Shared.MergeFunctionMap)
 local LinearUtils = require(Shared.LinearUtils)
 local Dragger = {}
 local toolModel = {
     Name = "Modify",
     Tool = nil,
+}
+local rotations = {
+    Y = CFrame.fromMatrix(Vector3.zero, Vector3.zAxis, Vector3.yAxis, -Vector3.xAxis),
+    Z = CFrame.fromMatrix(Vector3.zero, Vector3.yAxis, -Vector3.xAxis, Vector3.zAxis),
+    X = CFrame.fromMatrix(Vector3.zero, Vector3.xAxis, Vector3.zAxis, -Vector3.yAxis),
+    Y1 = CFrame.fromMatrix(Vector3.zero, -Vector3.zAxis, Vector3.yAxis, Vector3.xAxis),
+    Z1 = CFrame.fromMatrix(Vector3.zero, -Vector3.yAxis, Vector3.xAxis, Vector3.zAxis),
+    X1 = CFrame.fromMatrix(Vector3.zero, Vector3.xAxis, -Vector3.zAxis, Vector3.yAxis),
 }
 local selected = false
 local dragInfo: {
@@ -21,6 +31,18 @@ local dragInfo: {
     Increment: number,
     [string]: any,
 } = nil
+local function rotate(rotation: CFrame, input: InputObject?)
+    if dragInfo then
+        dragInfo.Orientation = rotation * dragInfo.Orientation
+    end
+end
+local keybinds = {}
+local rotKeybinds = {
+    [Enum.KeyCode.R] = rotations.Y,
+    [Enum.KeyCode.T] = rotations.X,
+    [Enum.KeyCode.Y] = rotations.Z1,
+}
+MergeFunctionMap(rotKeybinds, keybinds, rotate)
 Dragger.toolModel = toolModel
 function toolModel.Selected(tool, mouse)
     selected = true
@@ -94,10 +116,10 @@ local function dragMove(input: InputObject)
     -- targetFace * targetPoint * cubeOrientation * sourcePoint^-1 = sourceFace
     --if (cubeOrientation * Vector3.new(0,0,1) - Vector3.new(0,0,1)).Magnitude > 0.001 then print((cubeOrientation * Vector3.new(0,0,1) - Vector3.new(0,0,1)).Magnitude) end
     dragInfo.Preview.Anchored = false
-    dragInfo.Joint.C1 = targetFace * orient * CFrame.new(LinearUtils.RoundVectorToPlane(orient1 * targetPoint - sourcePoint, dragInfo.Increment))
+    dragInfo.Joint.C1 = targetFace * (orient + LinearUtils.RoundVectorToPlane(targetPoint - orient * sourcePoint, dragInfo.Increment))
     dragInfo.Joint.C0 = sourceFace
     dragInfo.Joint.Part1 = result.Instance
-    display.CFrame = dragInfo.Preview.CFrame * sourceFace * CFrame.new(sourcePoint) -- TODO:add orient
+    display.CFrame = dragInfo.Preview.CFrame * sourceFace * CFrame.new(sourcePoint)
     --print(workspace.CurrentCamera:WorldToScreenPoint(display.CFrame.Position).X - Mouse.X)
 end
 local function dragEnd(input: InputObject)
@@ -124,8 +146,12 @@ local function dragStart(input: InputObject)
     dragInfo.Joint.Parent = dragInfo.Preview
 end
 UserInputService.InputBegan:Connect(function(input, processed)
-    if selected and not processed and input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragStart(input)
+    if selected and not processed then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragStart(input)
+        elseif input.UserInputType == Enum.UserInputType.Keyboard then
+            keybinds[input.KeyCode](input)
+        end
     end
 end)
 UserInputService.InputEnded:Connect(function(input, processed)

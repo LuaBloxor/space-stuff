@@ -1,3 +1,4 @@
+--!strict
 local previews = Instance.new("Folder")
 previews.Name = "Previews"
 previews.Parent = workspace
