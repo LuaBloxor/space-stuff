@@ -31,18 +31,12 @@ local dragInfo: {
     Increment: number,
     [string]: any,
 } = nil
-local function rotate(rotation: CFrame, input: InputObject?)
-    if dragInfo then
-        dragInfo.Orientation = rotation * dragInfo.Orientation
-    end
-end
 local keybinds = {}
 local rotKeybinds = {
     [Enum.KeyCode.R] = rotations.Y,
     [Enum.KeyCode.T] = rotations.X,
     [Enum.KeyCode.Y] = rotations.Z1,
 }
-MergeFunctionMap(rotKeybinds, keybinds, rotate)
 Dragger.toolModel = toolModel
 function toolModel.Selected(tool, mouse)
     selected = true
@@ -69,7 +63,7 @@ local function raycast(excludedInstance: Instance?)
     local result = workspace:Raycast(unitRay.Origin, unitRay.Direction * 100, raycastParams)
     return result
 end
-local function dragMove(input: InputObject)
+local function dragMove(input: InputObject?)
     if not dragInfo then return end
     local result = raycast(dragInfo.Instance)
     if not result or not result.Instance:IsA("BasePart") then return end
@@ -92,7 +86,7 @@ local function dragMove(input: InputObject)
     local targetPart = result.Instance.CFrame
     -- local sourcePart = targetPart * targetFace * sourceFace:Inverse() -- eq 2
     -- local eq3 = sourceFace:Inverse() -- sourcePart relative to targetFace's frame
-    local cubeOrientation = LinearUtils.ClosestCubeElementToCF(sourceFace.Rotation:Inverse() * result.Instance.CFrame.Rotation * targetFace.Rotation * ROT) * dragInfo.Orientation
+    local cubeOrientation = LinearUtils.ClosestCubeElementToCF(sourceFace.Rotation:Inverse() * dragInfo.Orientation:Inverse() * result.Instance.CFrame.Rotation * targetFace.Rotation * ROT)
     --ClosestCubeElementToCF produces the inverted CFrame snapped to the nearest cube state given a CFrame
     local orient = (ROT * cubeOrientation)
     local orient1 = orient:Inverse()
@@ -137,7 +131,7 @@ local function dragStart(input: InputObject)
         Instance = result.Instance,
         Handle = handle,
         Joint = Instance.new("Weld"),
-        Orientation = CFrame.identity,
+        Orientation = result.Instance.CFrame.Rotation,
         Increment = 1,
     }
     dragInfo.Preview = Previews:PreviewPart(dragInfo.Instance, dragInfo.Joint)
@@ -145,12 +139,20 @@ local function dragStart(input: InputObject)
     dragInfo.Joint.Part0 = dragInfo.Preview
     dragInfo.Joint.Parent = dragInfo.Preview
 end
+local function rotate(rotation: CFrame, input: InputObject?)
+    if dragInfo then
+        dragInfo.Orientation = rotation * dragInfo.Orientation
+        dragMove(input)
+    end
+end
+MergeFunctionMap(rotKeybinds, keybinds, rotate)
 UserInputService.InputBegan:Connect(function(input, processed)
     if selected and not processed then
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragStart(input)
         elseif input.UserInputType == Enum.UserInputType.Keyboard then
-            keybinds[input.KeyCode](input)
+            local keybind = keybinds[input.KeyCode]
+            if keybind then keybind(input) end
         end
     end
 end)
